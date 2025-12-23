@@ -37,6 +37,15 @@ local currentMessage = ""
 local messageTimer = 0
 local messageInterval = 3
 
+local function fileExists(path)
+    if love.filesystem.getInfo then
+        return love.filesystem.getInfo(path) ~= nil
+    elseif love.filesystem.exists then
+        return love.filesystem.exists(path)
+    end
+    return false
+end
+
 local function shouldFlip()
     return math.floor(score / 200) % 2 == 1
 end
@@ -53,7 +62,7 @@ local function pickMotivation()
 end
 
 local function loadHighScore()
-    if love.filesystem.getInfo(highScoreFile) then
+    if fileExists(highScoreFile) then
         local saved = love.filesystem.read(highScoreFile)
         local value = tonumber(saved)
         if value then
@@ -73,7 +82,7 @@ local function loadCactusImages()
     }
 
     for _, path in ipairs(variants) do
-        if love.filesystem.getInfo(path) then
+        if fileExists(path) then
             table.insert(cactusImages, love.graphics.newImage(path))
         end
     end
@@ -92,7 +101,7 @@ function love.load()
     pickMotivation()
 
     local bgmPath = "assets/goofy_ahh_bgm.wav"
-    if love.filesystem.getInfo(bgmPath) then
+    if fileExists(bgmPath) then
         bgmSource = love.audio.newSource(bgmPath, "static")
         bgmSource:setLooping(true)
         bgmSource:setVolume(0.6)
@@ -113,12 +122,6 @@ function love.load()
 end
 
 function love.update(dt)
-    if bgmSource and not bgmSource:isPlaying() then
-        bgmSource:stop()
-        bgmSource:seek(0)
-        bgmSource:play()
-    end
-
     if gameOver then return end
 
     messageTimer = messageTimer + dt
