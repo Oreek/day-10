@@ -93,7 +93,7 @@ function love.load()
 
     local bgmPath = "assets/goofy_ahh_bgm.wav"
     if love.filesystem.getInfo(bgmPath) then
-        bgmSource = love.audio.newSource(bgmPath, "stream")
+        bgmSource = love.audio.newSource(bgmPath, "static")
         bgmSource:setLooping(true)
         bgmSource:setVolume(0.6)
         bgmSource:play()
@@ -113,6 +113,12 @@ function love.load()
 end
 
 function love.update(dt)
+    if bgmSource and not bgmSource:isPlaying() then
+        bgmSource:stop()
+        bgmSource:seek(0)
+        bgmSource:play()
+    end
+
     if gameOver then return end
 
     messageTimer = messageTimer + dt
